@@ -1,10 +1,14 @@
 import React from 'react';
 import './App.css';
 import ReactDOM from "react-dom";
+import axios from 'axios';
 
 const emailRegex = RegExp(
   /^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/
 );
+
+
+
 
 const formValid = ({ formErrors, ...rest }) => {
   let valid = true;
@@ -41,10 +45,26 @@ class App extends React.Component {
     };
   }
 
-
+ 
+ componentDidMount(){
+  axios.get('http://localhost:3001/usuarios').then(res=>{
+   //console.log(res);
+    console.log(res.data);
+  });
+  
+ }
 
   handleSubmit = e => {
     e.preventDefault();
+
+    const usuario = {
+      nome: this.state.firstName + ' ' + this.state.lastName,
+      senha: this.state.password,
+      telefone: "88888888",
+      estado: "São paulo",
+      cidade: "campinas",
+      email: this.state.email
+     };
 
     if (formValid(this.state)) {
       console.log(`
@@ -54,14 +74,41 @@ class App extends React.Component {
         Email: ${this.state.email}
         Password: ${this.state.password}
       `);
+      
+        axios.post('http://localhost:3001/usuario',usuario)
+       .then(res =>{
+         console.log(res.data);
+       })
+
+    
     } else {
       console.error("FORM INVALID - DISPLAY ERROR MESSAGE");
     }
   };
 
+  handleLogin = e =>{
+   e.preventDefault();
+
+    const usuario = {
+    email: this.state.email,
+    senha: this.state.password,
+   };
+
+  //if (formValid(this.state)) {
+    console.log(`
+      --SUBMITTING--
+      Email: ${this.state.email}
+      Password: ${this.state.password}
+    `);
+    
+     axios.post('http://localhost:3001/loginUsuario',usuario)
+     .then(res =>{
+       console.log(res);
+     })
+};
 
 
-
+ 
 
   handleChange = e => {
     e.preventDefault();
@@ -102,7 +149,7 @@ class App extends React.Component {
       return(
         <div>
           <h1>Create account</h1>
-          <form onSubmit={this.handleSubmit} noValidate>
+          <form onSubmit={this.handleSubmit} noValidate method = "POST">
             <div className="firstName">
               <label htmlFor="firstName">First Name</label>
               <input
@@ -171,7 +218,7 @@ class App extends React.Component {
       return(
         <div>
           <h1>Login</h1>
-          <form onSubmit={this.handleSubmit} noValidate>
+          <form onSubmit={this.handleLogin} noValidate method = "POST" >
             <div className="email">
               <label htmlFor="email">Email</label>
               <input
@@ -199,7 +246,7 @@ class App extends React.Component {
             </div>
             <div className="createAccount">
               <button type="submit">Login</button>
-              <small onClick={this.handleClick}>Cadastre-se gratis!</small>
+              <small onClick={this.handleClickGet}>Cadastre-se gratis!</small>
             </div>
           </form>
           
